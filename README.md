@@ -1,62 +1,85 @@
-# E*TRADE Python Application
+import unittest
+from unittest.mock import patch, MagicMock
+import json
+import sys
+import os
 
-A basic Python application that demonstrates how to authenticate with the E*TRADE API using OAuth 1.0a and fetch account information.
+# Add the current directory to path so we can import our modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-## Prerequisites
+from etrade_auth import get_request_token, get_access_token
+from etrade_client import ETradeClient
 
-- Python 3.6 or higher
-- An E*TRADE account with Sandbox API keys (Consumer Key and Consumer Secret)
+class TestETradeApp(unittest.TestCase):
 
-## Installation
+    @patch('etrade_auth.OAuth1Session')
+    def test_get_request_token(self, mock_oauth):
+        mock_session = mock_oauth.return_value
+        mock_session.fetch_request_token.return_value = {
+            'oauth_token': 'fake_rt',
+            'oauth_token_secret': 'fake_rts'
+        }
+        
+        rt, rts = get_request_token('key', 'secret', 'https://api.com')
+        
+        self.assertEqual(rt, 'fake_rt')
+        self.assertEqual(rts, 'fake_rts')
+        mock_session.fetch_request_token.assert_called_once()
 
-1. Clone this repository (or copy the files).
-2. Install the required dependencies:
+    @patch('etrade_auth.OAuth1Session')
+    def test_get_access_token(self, mock_oauth):
+        mock_session = mock_oauth.return_value
+        mock_session.fetch_access_token.return_value = {
+            'oauth_token': 'fake_at',
+            'oauth_token_secret': 'fake_ats'
+        }
+        
+        at, ats = get_access_token('key', 'secret', 'rt', 'rts', '123', 'https://api.com')
+        
+        self.assertEqual(at, 'fake_at')
+        self.assertEqual(ats, 'fake_ats')
+        mock_session.fetch_access_token.assert_called_once()
 
-   ```bash
-   pip install requests requests-oauthlib
-   ```
+    @patch('etrade_client.requests.get')
+    def test_list_accounts(self, mock_get):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {'AccountListResponse': {'Accounts': {'Account': []}}}
+        mock_get.return_value = mock_response
+        
+        client = ETradeClient('key', 'secret', 'at', 'ats', 'https://api.com')
+        accounts = client.list_accounts()
+        
+        self.assertEqual(accounts['AccountListResponse']['Accounts']['Account'], [])
+        mock_get.assert_called_once()
 
-## Configuration
+    @patch('etrade_client.requests.get')
+    def test_get_account_balances(self, mock_get):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'BalanceResponse': {
+                'Computed': {
+                    'cashBalance': 1000.50,
+                    'cashAvailableForInvestment': 800.00,
+                    'realTimeValues': {
+                        'totalAccountValue': 5000.00
+                    }
+                }
+            }
+        }
+        mock_get.return_value = mock_response
+        
+        client = ETradeClient('key', 'secret', 'at', 'ats', 'https://api.com')
+        balance = client.get_account_balances('acc_key')
+        
+        self.assertEqual(balance['BalanceResponse']['Computed']['cashBalance'], 1000.50)
+        self.assertEqual(balance['BalanceResponse']['Computed']['realTimeValues']['totalAccountValue'], 5000.00)
+        mock_get.assert_called_once()
+        # Verify params
+        args, kwargs = mock_get.call_args
+        self.assertEqual(kwargs['params']['instType'], 'BROKERAGE')
+        self.assertEqual(kwargs['params']['realTimeNAV'], 'true')
 
-1. Locate the `config.json` file in the root directory.
-2. Update the file with your E*TRADE Sandbox Consumer Key and Consumer Secret:
-
-   ```json
-   {
-       "consumer_key": "YOUR_CONSUMER_KEY",
-       "consumer_secret": "YOUR_CONSUMER_SECRET",
-       "base_url": "https://apisb.etrade.com",
-       "auth_url": "https://us.etrade.com/e/t/etws/authorize"
-   }
-   ```
-
-## Running the Application
-
-1. Run the main script:
-
-   ```bash
-   python main.py
-   ```
-
-2. Follow the on-screen instructions:
-   - Step 1: The application will fetch a request token.
-   - Step 2: It will provide a URL. Copy and paste this URL into your browser.
-   - Step 3: Log in to E*TRADE (Sandbox environment) and authorize the application.
-   - Step 4: Copy the verification code provided by E*TRADE and paste it back into the terminal.
-   - Step 5: The application will fetch the access token and display your account list.
-
-## Running Tests
-
-To run the unit tests and verify the logic:
-
-```bash
-python3 -m unittest tests/test_etrade.py
-```
-
-## File Structure
-
-- `main.py`: The entry point that orchestrates the OAuth flow and API calls.
-- `etrade_auth.py`: Contains functions for handling the OAuth 1.0a handshake.
-- `etrade_client.py`: A client class for making signed requests to E*TRADE API endpoints.
-- `config.json`: Configuration file for API keys and URLs.
-- `tests/test_etrade.py`: Unit tests for the authentication and client logic.
+if __name__ == '__main__':
+    unittest.main()

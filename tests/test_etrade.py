@@ -53,5 +53,33 @@ class TestETradeApp(unittest.TestCase):
         self.assertEqual(accounts['AccountListResponse']['Accounts']['Account'], [])
         mock_get.assert_called_once()
 
+    @patch('etrade_client.requests.get')
+    def test_get_account_balances(self, mock_get):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'BalanceResponse': {
+                'Computed': {
+                    'cashBalance': 1000.50,
+                    'cashAvailableForInvestment': 800.00,
+                    'realTimeValues': {
+                        'totalAccountValue': 5000.00
+                    }
+                }
+            }
+        }
+        mock_get.return_value = mock_response
+
+        client = ETradeClient('key', 'secret', 'at', 'ats', 'https://api.com')
+        balance = client.get_account_balances('acc_key')
+
+        self.assertEqual(balance['BalanceResponse']['Computed']['cashBalance'], 1000.50)
+        self.assertEqual(balance['BalanceResponse']['Computed']['realTimeValues']['totalAccountValue'], 5000.00)
+        mock_get.assert_called_once()
+        # Verify params
+        args, kwargs = mock_get.call_args
+        self.assertEqual(kwargs['params']['instType'], 'BROKERAGE')
+        self.assertEqual(kwargs['params']['realTimeNAV'], 'true')
+
 if __name__ == '__main__':
     unittest.main()

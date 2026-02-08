@@ -51,8 +51,52 @@ def main():
 
         print("\nStep 4: Fetching account list...")
         accounts_data = client.list_accounts()
-        print("\nAccount List Response:")
-        print(json.dumps(accounts_data, indent=2))
+
+        accounts = accounts_data.get("AccountListResponse", {}).get("Accounts", {}).get("Account", [])
+
+        if not accounts:
+            print("No accounts found.")
+            return
+
+        print(f"\nFound {len(accounts)} account(s):")
+        for acc in accounts:
+            acc_id = acc.get("accountId")
+            acc_key = acc.get("accountIdKey")
+            acc_name = acc.get("accountName", acc.get("accountDesc", "Unknown"))
+            acc_status = acc.get("accountStatus", "Unknown")
+
+            print(f"\n" + "="*40)
+            print(f"Account: {acc_name}")
+            print(f"ID:      {acc_id}")
+            print(f"Status:  {acc_status}")
+            print("-" * 40)
+
+            if acc_status.upper() == "ACTIVE":
+                try:
+                    balance_data = client.get_account_balances(acc_key)
+                    balance = balance_data.get("BalanceResponse", {})
+
+                    computed = balance.get("Computed", {})
+                    real_time = computed.get("realTimeValues", {})
+
+                    total_value = real_time.get("totalAccountValue", "N/A")
+                    cash_balance = computed.get("cashBalance", "N/A")
+                    cash_available = computed.get("cashAvailableForInvestment", "N/A")
+
+                    print(f"Total Account Value:        ${total_value}")
+                    print(f"Net Cash Balance:           ${cash_balance}")
+                    print(f"Cash Available for Invest:  ${cash_available}")
+
+                    # Check for money market in Cash section
+                    cash_section = balance.get("Cash", {})
+                    if "moneyMktBalance" in cash_section:
+                        print(f"Money Market Balance:       ${cash_section.get('moneyMktBalance')}")
+
+                except Exception as e:
+                    print(f"Could not fetch balance for account {acc_id}: {e}")
+            else:
+                print("Skipping balance fetch for inactive account.")
+            print("="*40)
 
     except Exception as e:
         print(f"\nAn error occurred: {e}")

@@ -32,13 +32,16 @@ class ETradeClient:
             print(f"Error listing accounts: {response.status_code} - {response.text}")
             response.raise_for_status()
 
-    def get_account_balances(self, account_id_key):
+    def get_account_balances(self, account_id_key, inst_type="BROKERAGE", real_time_nav=True):
         """
         Fetch balances for a specific account.
         """
         url = f"{self.base_url}/v1/accounts/{account_id_key}/balance.json"
-        # Optional: Add parameters if needed (e.g. realTimeNAV=true)
-        response = requests.get(url, auth=self.auth)
+        params = {
+            "instType": inst_type,
+            "realTimeNAV": "true" if real_time_nav else "false"
+        }
+        response = requests.get(url, auth=self.auth, params=params)
 
         if response.status_code == 200:
             return response.json()
