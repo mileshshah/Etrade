@@ -53,29 +53,31 @@ A basic Python application that demonstrates how to authenticate with the E*TRAD
    - Step 4: Copy the verification code provided by E*TRADE and paste it back into the terminal.
    - Step 5: The application will fetch the access token, display your account details, and perform a Gemini analysis of your portfolio.
 
-## Testing and Verification
+## Manual Testing (No E*TRADE Keys Required)
 
-### Automated Tests
+You can manually test the portfolio display logic and Gemini AI integration without needing valid E*TRADE API keys.
+
+1. **Configure Gemini Key**: Add your Google Gemini API key to `config_sandbox.json`.
+2. **Run the manual test script**:
+
+   ```bash
+   python manual_test.py
+   ```
+
+This script uses sample data to simulate a portfolio and sends it to Gemini for analysis. It allows you to verify the formatting and AI insights immediately.
+
+## Automated Testing
+
 To run the suite of unit tests which mock the E*TRADE and Gemini APIs:
 
 ```bash
 python3 -m unittest tests/test_etrade.py
 ```
 
-### Manual Verification of Gemini Integration
-If you want to verify that the Gemini client is working without using real E*TRADE keys:
-1. Ensure your `config_sandbox.json` has a valid `gemini_api_key`.
-2. You can temporarily modify `main.py` to bypass Step 1-4 and call `GeminiClient.analyze_portfolio()` with sample data.
-
-### Expected Output
-When running successfully, you should see:
-- A formatted table of your accounts.
-- A detailed list of portfolio holdings (Company, Symbol, Qty, Price, Value).
-- A section titled "GEMINI PORTFOLIO INSIGHTS" containing AI-generated analysis of your holdings.
-
 ## File Structure
 
 - `main.py`: The entry point that orchestrates the OAuth flow, API calls, and Gemini analysis.
+- `manual_test.py`: A script for verifying the UI and AI integration using sample data.
 - `etrade_auth.py`: Contains functions for handling the OAuth 1.0a handshake.
 - `etrade_client.py`: A client class for making signed requests to E*TRADE API endpoints.
 - `gemini_client.py`: A client class for interacting with the Google Gemini API.
