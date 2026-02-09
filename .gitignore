@@ -6,5 +6,3 @@ __pycache__/
 env/
 venv/
 .env
-# Do not ignore the config files as the user asked to create them,
-# but in a real app these should be templates.
