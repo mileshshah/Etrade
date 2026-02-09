@@ -9,6 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from etrade_auth import get_request_token, get_access_token
 from etrade_client import ETradeClient
+from gemini_client import GeminiClient
 
 class TestETradeApp(unittest.TestCase):
 
@@ -110,6 +111,21 @@ class TestETradeApp(unittest.TestCase):
         self.assertEqual(pos['pricePaid'], 145.50)
         self.assertEqual(pos['marketValue'], 1500.00)
         mock_get.assert_called_once()
+
+class TestGeminiClient(unittest.TestCase):
+
+    @patch('google.genai.Client')
+    def test_analyze_portfolio(self, mock_genai_client):
+        mock_client_instance = mock_genai_client.return_value
+        mock_response = MagicMock()
+        mock_response.text = "Analysis result"
+        mock_client_instance.models.generate_content.return_value = mock_response
+
+        client = GeminiClient('fake_api_key')
+        result = client.analyze_portfolio([{'symbol': 'AAPL', 'company': 'Apple Inc'}])
+
+        self.assertEqual(result, "Analysis result")
+        mock_client_instance.models.generate_content.assert_called_once()
 
 if __name__ == '__main__':
     unittest.main()

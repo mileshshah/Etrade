@@ -1,11 +1,12 @@
 # E*TRADE Python Application
 
-A basic Python application that demonstrates how to authenticate with the E*TRADE API using OAuth 1.0a and fetch account information.
+A basic Python application that demonstrates how to authenticate with the E*TRADE API using OAuth 1.0a, fetch account information, and analyze your portfolio using Google Gemini.
 
 ## Prerequisites
 
 - Python 3.6 or higher
-- An E*TRADE account with Sandbox API keys (Consumer Key and Consumer Secret)
+- An E*TRADE account with API keys (Sandbox or Production)
+- A Google Gemini API key (from [Google AI Studio](https://aistudio.google.com/))
 
 ## Installation
 
@@ -13,37 +14,44 @@ A basic Python application that demonstrates how to authenticate with the E*TRAD
 2. Install the required dependencies:
 
    ```bash
-   pip install requests requests-oauthlib
+   pip install -r requirements.txt
    ```
 
 ## Configuration
 
-1. Locate the `config.json` file in the root directory.
-2. Update the file with your E*TRADE Sandbox Consumer Key and Consumer Secret:
+1. Locate the configuration files: `config_sandbox.json` and `config_prod.json`.
+2. Update the appropriate file with your E*TRADE Consumer Key, Consumer Secret, and Gemini API Key:
 
    ```json
    {
        "consumer_key": "YOUR_CONSUMER_KEY",
        "consumer_secret": "YOUR_CONSUMER_SECRET",
        "base_url": "https://apisb.etrade.com",
-       "auth_url": "https://us.etrade.com/e/t/etws/authorize"
+       "auth_url": "https://us.etrade.com/e/t/etws/authorize",
+       "gemini_api_key": "YOUR_GEMINI_API_KEY"
    }
    ```
 
 ## Running the Application
 
-1. Run the main script:
+1. Run the main script (defaults to sandbox):
 
    ```bash
    python main.py
    ```
 
+   To run in production mode:
+
+   ```bash
+   python main.py prod
+   ```
+
 2. Follow the on-screen instructions:
    - Step 1: The application will fetch a request token.
    - Step 2: It will provide a URL. Copy and paste this URL into your browser.
-   - Step 3: Log in to E*TRADE (Sandbox environment) and authorize the application.
+   - Step 3: Log in to E*TRADE and authorize the application.
    - Step 4: Copy the verification code provided by E*TRADE and paste it back into the terminal.
-   - Step 5: The application will fetch the access token and display your account list.
+   - Step 5: The application will fetch the access token, display your account details, and perform a Gemini analysis of your portfolio.
 
 ## Running Tests
 
@@ -55,8 +63,9 @@ python3 -m unittest tests/test_etrade.py
 
 ## File Structure
 
-- `main.py`: The entry point that orchestrates the OAuth flow and API calls.
+- `main.py`: The entry point that orchestrates the OAuth flow, API calls, and Gemini analysis.
 - `etrade_auth.py`: Contains functions for handling the OAuth 1.0a handshake.
 - `etrade_client.py`: A client class for making signed requests to E*TRADE API endpoints.
-- `config.json`: Configuration file for API keys and URLs.
-- `tests/test_etrade.py`: Unit tests for the authentication and client logic.
+- `gemini_client.py`: A client class for interacting with the Google Gemini API.
+- `config_sandbox.json` / `config_prod.json`: Configuration files for API keys and URLs.
+- `tests/test_etrade.py`: Unit tests for the authentication, E*TRADE client, and Gemini client logic.

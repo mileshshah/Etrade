@@ -2,5 +2,6 @@
     "consumer_key": "YOUR_PROD_CONSUMER_KEY",
     "consumer_secret": "YOUR_PROD_CONSUMER_SECRET",
     "base_url": "https://api.etrade.com",
-    "auth_url": "https://us.etrade.com/e/t/etws/authorize"
+    "auth_url": "https://us.etrade.com/e/t/etws/authorize",
+    "gemini_api_key": "YOUR_GEMINI_API_KEY"
 }
