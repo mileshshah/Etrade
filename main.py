@@ -77,10 +77,10 @@ def main():
             acc_name = acc.get("accountName", acc.get("accountDesc", "Unknown"))
             acc_status = acc.get("accountStatus", "Unknown")
 
-            print(f"\n" + "="*60)
+            print(f"\n" + "="*80)
             print(f"Account: {acc_name} (ID: {acc_id})")
             print(f"Status:  {acc_status}")
-            print("-" * 60)
+            print("-" * 80)
 
             if acc_status.upper() == "ACTIVE":
                 # Fetch Balance
@@ -98,7 +98,7 @@ def main():
                     print(f"Could not fetch balance: {e}")
 
                 # Fetch Portfolio
-                print("-" * 60)
+                print("-" * 80)
                 print("Portfolio Positions:")
                 try:
                     portfolio_data = client.view_portfolio(acc_key)
@@ -109,14 +109,23 @@ def main():
                         positions = port.get("Position", [])
                         if positions:
                             positions_found = True
-                            print(f"{'Symbol':<10} {'Type':<10} {'Qty':<10} {'Last Price':<12} {'Market Value':<15}")
+                            print(f"{'Company':<25} {'Symbol':<10} {'Qty':<8} {'Price Paid':<15} {'Market Value':<15}")
+                            print("-" * 80)
                             for pos in positions:
                                 symbol = pos.get("Product", {}).get("symbol", "N/A")
-                                sec_type = pos.get("Product", {}).get("securityType", "N/A")
+                                company = pos.get("symbolDescription", "N/A")
                                 qty = pos.get("quantity", 0)
-                                price = pos.get("price", 0)
+                                # pricePaid is the total cost for the position according to some docs,
+                                # but often it's price per share. Total Price Paid = totalCost or (pricePaid * quantity)
+                                # Let's show what the API provides as 'pricePaid' (usually cost basis)
+                                price_paid = pos.get("pricePaid", 0)
                                 mkt_val = pos.get("marketValue", 0)
-                                print(f"{symbol:<10} {sec_type:<10} {qty:<10} ${price:<11.2f} ${mkt_val:<14.2f}")
+
+                                # Limit company name length for display
+                                if len(company) > 22:
+                                    company = company[:20] + ".."
+
+                                print(f"{company:<25} {symbol:<10} {qty:<8} ${price_paid:<14.2f} ${mkt_val:<14.2f}")
 
                     if not positions_found:
                         print("No positions found in this account.")
@@ -124,7 +133,7 @@ def main():
                     print(f"Could not fetch portfolio: {e}")
             else:
                 print("Skipping details for inactive account.")
-            print("="*60)
+            print("="*80)
 
     except Exception as e:
         print(f"\nAn error occurred: {e}")

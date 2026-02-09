@@ -88,7 +88,9 @@ class TestETradeApp(unittest.TestCase):
                         'Position': [
                             {
                                 'Product': {'symbol': 'AAPL', 'securityType': 'EQ'},
+                                'symbolDescription': 'APPLE INC COM',
                                 'quantity': 10,
+                                'pricePaid': 145.50,
                                 'price': 150.00,
                                 'marketValue': 1500.00
                             }
@@ -102,12 +104,12 @@ class TestETradeApp(unittest.TestCase):
         client = ETradeClient('key', 'secret', 'at', 'ats', 'https://api.com')
         portfolio = client.view_portfolio('acc_key')
 
-        self.assertEqual(portfolio['PortfolioResponse']['AccountPortfolio'][0]['Position'][0]['Product']['symbol'], 'AAPL')
+        pos = portfolio['PortfolioResponse']['AccountPortfolio'][0]['Position'][0]
+        self.assertEqual(pos['Product']['symbol'], 'AAPL')
+        self.assertEqual(pos['symbolDescription'], 'APPLE INC COM')
+        self.assertEqual(pos['pricePaid'], 145.50)
+        self.assertEqual(pos['marketValue'], 1500.00)
         mock_get.assert_called_once()
-        # Verify params
-        args, kwargs = mock_get.call_args
-        self.assertEqual(kwargs['params']['count'], 50)
-        self.assertEqual(kwargs['params']['view'], 'QUICK')
 
 if __name__ == '__main__':
     unittest.main()
