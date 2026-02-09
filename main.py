@@ -77,38 +77,54 @@ def main():
             acc_name = acc.get("accountName", acc.get("accountDesc", "Unknown"))
             acc_status = acc.get("accountStatus", "Unknown")
 
-            print(f"\n" + "="*40)
-            print(f"Account: {acc_name}")
-            print(f"ID:      {acc_id}")
+            print(f"\n" + "="*60)
+            print(f"Account: {acc_name} (ID: {acc_id})")
             print(f"Status:  {acc_status}")
-            print("-" * 40)
+            print("-" * 60)
 
             if acc_status.upper() == "ACTIVE":
+                # Fetch Balance
                 try:
                     balance_data = client.get_account_balances(acc_key)
                     balance = balance_data.get("BalanceResponse", {})
-
                     computed = balance.get("Computed", {})
                     real_time = computed.get("realTimeValues", {})
 
                     total_value = real_time.get("totalAccountValue", "N/A")
                     cash_balance = computed.get("cashBalance", "N/A")
-                    cash_available = computed.get("cashAvailableForInvestment", "N/A")
 
-                    print(f"Total Account Value:        ${total_value}")
-                    print(f"Net Cash Balance:           ${cash_balance}")
-                    print(f"Cash Available for Invest:  ${cash_available}")
-
-                    # Check for money market in Cash section
-                    cash_section = balance.get("Cash", {})
-                    if "moneyMktBalance" in cash_section:
-                        print(f"Money Market Balance:       ${cash_section.get('moneyMktBalance')}")
-
+                    print(f"Total Value: ${total_value} | Cash: ${cash_balance}")
                 except Exception as e:
-                    print(f"Could not fetch balance for account {acc_id}: {e}")
+                    print(f"Could not fetch balance: {e}")
+
+                # Fetch Portfolio
+                print("-" * 60)
+                print("Portfolio Positions:")
+                try:
+                    portfolio_data = client.view_portfolio(acc_key)
+                    portfolios = portfolio_data.get("PortfolioResponse", {}).get("AccountPortfolio", [])
+
+                    positions_found = False
+                    for port in portfolios:
+                        positions = port.get("Position", [])
+                        if positions:
+                            positions_found = True
+                            print(f"{'Symbol':<10} {'Type':<10} {'Qty':<10} {'Last Price':<12} {'Market Value':<15}")
+                            for pos in positions:
+                                symbol = pos.get("Product", {}).get("symbol", "N/A")
+                                sec_type = pos.get("Product", {}).get("securityType", "N/A")
+                                qty = pos.get("quantity", 0)
+                                price = pos.get("price", 0)
+                                mkt_val = pos.get("marketValue", 0)
+                                print(f"{symbol:<10} {sec_type:<10} {qty:<10} ${price:<11.2f} ${mkt_val:<14.2f}")
+
+                    if not positions_found:
+                        print("No positions found in this account.")
+                except Exception as e:
+                    print(f"Could not fetch portfolio: {e}")
             else:
-                print("Skipping balance fetch for inactive account.")
-            print("="*40)
+                print("Skipping details for inactive account.")
+            print("="*60)
 
     except Exception as e:
         print(f"\nAn error occurred: {e}")
