@@ -4,24 +4,36 @@ import sys
 from etrade_auth import get_request_token, get_authorization_url, get_access_token
 from etrade_client import ETradeClient
 
-def load_config():
-    """Load configuration from config.json."""
+def load_config(env):
+    """Load configuration for the specified environment."""
+    filename = f'config_{env}.json'
     try:
-        with open('config.json', 'r') as f:
+        with open(filename, 'r') as f:
             return json.load(f)
     except FileNotFoundError:
-        print("config.json not found. Please create it from the template.")
+        print(f"{filename} not found. Please create it from the template.")
         sys.exit(1)
 
 def main():
-    config = load_config()
+    # Default to sandbox if no argument is provided
+    env = 'sandbox'
+    if len(sys.argv) > 1:
+        arg = sys.argv[1].lower()
+        if arg in ['sandbox', 'prod']:
+            env = arg
+        else:
+            print(f"Unknown environment: {arg}. Using 'sandbox' as default.")
+
+    print(f"Starting E*TRADE application in {env.upper()} mode...")
+
+    config = load_config(env)
     consumer_key = config.get('consumer_key')
     consumer_secret = config.get('consumer_secret')
-    base_url = config.get('base_url', 'https://apisb.etrade.com')
-    auth_base_url = config.get('auth_url', 'https://us.etrade.com/e/t/etws/authorize')
+    base_url = config.get('base_url')
+    auth_base_url = config.get('auth_url')
 
-    if not consumer_key or consumer_key == "YOUR_CONSUMER_KEY":
-        print("Please update config.json with your E*TRADE consumer key and secret.")
+    if not consumer_key or "YOUR" in consumer_key:
+        print(f"Please update config_{env}.json with your E*TRADE consumer key and secret.")
         return
 
     try:
