@@ -48,3 +48,22 @@ class ETradeClient:
         else:
             print(f"Error fetching balances: {response.status_code} - {response.text}")
             response.raise_for_status()
+
+    def view_portfolio(self, account_id_key, count=50, view="QUICK"):
+        """
+        Fetch portfolio positions for a specific account.
+        """
+        url = f"{self.base_url}/v1/accounts/{account_id_key}/portfolio.json"
+        params = {
+            "count": count,
+            "view": view
+        }
+        response = requests.get(url, auth=self.auth, params=params)
+
+        if response.status_code == 200:
+            return response.json()
+        elif response.status_code == 204:
+            return {"PortfolioResponse": {"AccountPortfolio": []}}
+        else:
+            print(f"Error fetching portfolio: {response.status_code} - {response.text}")
+            response.raise_for_status()
