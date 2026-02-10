@@ -122,7 +122,8 @@ class TestGeminiClient(unittest.TestCase):
         mock_client_instance.models.generate_content.return_value = mock_response
 
         client = GeminiClient('fake_api_key')
-        result = client.analyze_portfolio([{'symbol': 'AAPL', 'company': 'Apple Inc'}])
+        # Only symbol, company, and quantity should be present
+        result = client.analyze_portfolio([{'symbol': 'AAPL', 'company': 'Apple Inc', 'quantity': 10}])
 
         self.assertEqual(result, "Analysis result")
         mock_client_instance.models.generate_content.assert_called_once()
@@ -135,7 +136,8 @@ class TestGeminiClient(unittest.TestCase):
         mock_client_instance.models.generate_content.return_value = mock_response
 
         client = GeminiClient('fake_api_key')
-        result = client.chat([{'symbol': 'AAPL', 'company': 'Apple Inc'}], "Is Apple a good buy?")
+        # Only symbol, company, and quantity should be present
+        result = client.chat([{'symbol': 'AAPL', 'company': 'Apple Inc', 'quantity': 10}], "Is Apple a good buy?")
 
         self.assertEqual(result, "Chat result")
         mock_client_instance.models.generate_content.assert_called_once()

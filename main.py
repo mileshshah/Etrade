@@ -113,12 +113,11 @@ def view_portfolio(client, accounts):
                         price_paid = pos.get("pricePaid", 0)
                         mkt_val = pos.get("marketValue", 0)
 
+                        # Restrict data for Gemini to only symbol, company name and quantity
                         portfolio_summary.append({
                             "symbol": symbol,
                             "company": company,
-                            "quantity": qty,
-                            "marketValue": mkt_val,
-                            "pricePaid": price_paid
+                            "quantity": qty
                         })
 
                         display_company = company
