@@ -133,6 +133,87 @@ def view_portfolio(client, accounts):
 
     return portfolio_summary
 
+def place_order(client, accounts):
+    """Place an order for a stock."""
+    active_accounts = [a for a in accounts if a.get("accountStatus", "").upper() == "ACTIVE"]
+    if not active_accounts:
+        print("No active accounts available for trading.")
+        return
+
+    # If multiple accounts, let user choose. For simplicity, use the first one if only one.
+    if len(active_accounts) > 1:
+        print("\nSelect an account for the order:")
+        for i, acc in enumerate(active_accounts):
+            print(f"{i+1}. {acc.get('accountName')} ({acc.get('accountId')})")
+        acc_choice = int(input("Choice (1-{0}): ".format(len(active_accounts))).strip()) - 1
+        selected_account = active_accounts[acc_choice]
+    else:
+        selected_account = active_accounts[0]
+
+    acc_key = selected_account.get("accountIdKey")
+    print(f"\nPlacing order for account: {selected_account.get('accountName')} ({selected_account.get('accountId')})")
+
+    symbol = input("Enter stock symbol (e.g., AAPL): ").strip().upper()
+    action = input("Enter action (BUY or SELL): ").strip().upper()
+    if action not in ["BUY", "SELL"]:
+        print("Invalid action. Use BUY or SELL.")
+        return
+
+    try:
+        quantity = int(input("Enter quantity: ").strip())
+    except ValueError:
+        print("Invalid quantity.")
+        return
+
+    price_type = input("Enter price type (MARKET or LIMIT): ").strip().upper()
+    limit_price = None
+    if price_type == "LIMIT":
+        try:
+            limit_price = float(input("Enter limit price: ").strip())
+        except ValueError:
+            print("Invalid limit price.")
+            return
+    elif price_type != "MARKET":
+        print("Invalid price type. Use MARKET or LIMIT.")
+        return
+
+    # Step 1: Preview Order
+    print("\nPreviewing order...")
+    try:
+        preview_data = client.preview_order(acc_key, symbol, action, quantity, price_type, limit_price)
+        preview_response = preview_data.get("PreviewOrderResponse", {})
+
+        # Display preview details
+        order_preview = preview_response.get("Order", [{}])[0]
+        instr = order_preview.get("Instrument", [{}])[0]
+        est_amount = order_preview.get("estimatedTotalAmount", "N/A")
+        preview_id = preview_response.get("PreviewIds", [{}])[0].get("previewId")
+
+        print("\n" + "="*40)
+        print("ORDER PREVIEW")
+        print("-" * 40)
+        print(f"Symbol:         {instr.get('Product', {}).get('symbol')}")
+        print(f"Action:         {instr.get('orderAction')}")
+        print(f"Quantity:       {instr.get('quantity')}")
+        print(f"Price Type:     {order_preview.get('priceType')}")
+        if limit_price:
+            print(f"Limit Price:    ${order_preview.get('limitPrice')}")
+        print(f"Est. Total:     ${est_amount}")
+        print("="*40)
+
+        confirm = input("\nConfirm order? (yes/no): ").strip().lower()
+        if confirm == 'yes':
+            # Step 2: Place Order
+            print("Placing order...")
+            place_data = client.place_order(acc_key, preview_id, symbol, action, quantity, price_type, limit_price)
+            order_id = place_data.get("PlaceOrderResponse", {}).get("OrderIds", [{}])[0].get("orderId")
+            print(f"Order placed successfully! Order ID: {order_id}")
+        else:
+            print("Order cancelled.")
+
+    except Exception as e:
+        print(f"Error during order process: {e}")
+
 def chat_with_gemini(gemini, portfolio):
     """Interactive chat with Gemini about the portfolio."""
     if not gemini:
@@ -186,10 +267,11 @@ def main_menu():
         print("\n--- Main Menu ---")
         print("1. View Accounts")
         print("2. View Portfolio")
-        print("3. Chat with Gemini about Portfolio")
-        print("4. Exit")
+        print("3. Place Order (Buy/Sell)")
+        print("4. Chat with Gemini about Portfolio")
+        print("5. Exit")
 
-        choice = input("\nSelect an option (1-4): ").strip()
+        choice = input("\nSelect an option (1-5): ").strip()
 
         if choice == '1':
             cached_accounts = list_accounts(client)
@@ -198,13 +280,19 @@ def main_menu():
                 cached_accounts = list_accounts(client)
             cached_portfolio = view_portfolio(client, cached_accounts)
         elif choice == '3':
+            if not cached_accounts:
+                cached_accounts = list_accounts(client)
+            place_order(client, cached_accounts)
+            # Clear portfolio cache since it might change
+            cached_portfolio = []
+        elif choice == '4':
             if not cached_portfolio:
                 print("Fetching your portfolio data first for Gemini...")
                 if not cached_accounts:
                     cached_accounts = list_accounts(client)
                 cached_portfolio = view_portfolio(client, cached_accounts)
             chat_with_gemini(gemini, cached_portfolio)
-        elif choice == '4':
+        elif choice == '5':
             print("Goodbye!")
             break
         else:

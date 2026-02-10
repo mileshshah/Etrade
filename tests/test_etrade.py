@@ -112,6 +112,41 @@ class TestETradeApp(unittest.TestCase):
         self.assertEqual(pos['marketValue'], 1500.00)
         mock_get.assert_called_once()
 
+    @patch('etrade_client.requests.post')
+    def test_preview_order(self, mock_post):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'PreviewOrderResponse': {
+                'Order': [{'Instrument': [{'orderAction': 'BUY'}]}],
+                'PreviewIds': [{'previewId': 12345}]
+            }
+        }
+        mock_post.return_value = mock_response
+
+        client = ETradeClient('key', 'secret', 'at', 'ats', 'https://api.com')
+        preview = client.preview_order('acc_key', 'AAPL', 'BUY', 10)
+
+        self.assertEqual(preview['PreviewOrderResponse']['PreviewIds'][0]['previewId'], 12345)
+        mock_post.assert_called_once()
+
+    @patch('etrade_client.requests.post')
+    def test_place_order(self, mock_post):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'PlaceOrderResponse': {
+                'OrderIds': [{'orderId': 67890}]
+            }
+        }
+        mock_post.return_value = mock_response
+
+        client = ETradeClient('key', 'secret', 'at', 'ats', 'https://api.com')
+        place = client.place_order('acc_key', 12345, 'AAPL', 'BUY', 10)
+
+        self.assertEqual(place['PlaceOrderResponse']['OrderIds'][0]['orderId'], 67890)
+        mock_post.assert_called_once()
+
 class TestGeminiClient(unittest.TestCase):
 
     @patch('google.genai.Client')
