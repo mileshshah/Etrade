@@ -7,11 +7,8 @@ class GeminiClient:
 
     def analyze_portfolio(self, portfolio_data):
         """
-        Analyze the portfolio data using Gemini.
+        Perform a general analysis of the portfolio data.
         """
-        if not portfolio_data:
-            return "No portfolio data provided for analysis."
-
         prompt = f"""
         Analyze the following E*TRADE portfolio data:
         {portfolio_data}
@@ -24,7 +21,24 @@ class GeminiClient:
 
         Format the output clearly for a human reader.
         """
+        return self._generate(prompt)
 
+    def chat(self, portfolio_data, user_question):
+        """
+        Answer a specific user question about the portfolio data.
+        """
+        prompt = f"""
+        You are a financial assistant. Below is the user's E*TRADE portfolio data:
+        {portfolio_data}
+
+        The user has the following question:
+        "{user_question}"
+
+        Please provide a helpful, data-driven answer based on the portfolio information and your general knowledge of the market and companies involved.
+        """
+        return self._generate(prompt)
+
+    def _generate(self, prompt):
         try:
             response = self.client.models.generate_content(
                 model=self.model_id,
@@ -32,4 +46,4 @@ class GeminiClient:
             )
             return response.text
         except Exception as e:
-            return f"Error during Gemini analysis: {e}"
+            return f"Error during Gemini interaction: {e}"

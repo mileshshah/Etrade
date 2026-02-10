@@ -53,22 +53,9 @@ A basic Python application that demonstrates how to authenticate with the E*TRAD
    - Step 4: Copy the verification code provided by E*TRADE and paste it back into the terminal.
    - Step 5: The application will fetch the access token, display your account details, and perform a Gemini analysis of your portfolio.
 
-## Manual Testing (No E*TRADE Keys Required)
+## Running Tests
 
-You can manually test the portfolio display logic and Gemini AI integration without needing valid E*TRADE API keys.
-
-1. **Configure Gemini Key**: Add your Google Gemini API key to `config_sandbox.json`.
-2. **Run the manual test script**:
-
-   ```bash
-   python manual_test.py
-   ```
-
-This script uses sample data to simulate a portfolio and sends it to Gemini for analysis. It allows you to verify the formatting and AI insights immediately.
-
-## Automated Testing
-
-To run the suite of unit tests which mock the E*TRADE and Gemini APIs:
+To run the unit tests and verify the logic:
 
 ```bash
 python3 -m unittest tests/test_etrade.py
@@ -77,7 +64,6 @@ python3 -m unittest tests/test_etrade.py
 ## File Structure
 
 - `main.py`: The entry point that orchestrates the OAuth flow, API calls, and Gemini analysis.
-- `manual_test.py`: A script for verifying the UI and AI integration using sample data.
 - `etrade_auth.py`: Contains functions for handling the OAuth 1.0a handshake.
 - `etrade_client.py`: A client class for making signed requests to E*TRADE API endpoints.
 - `gemini_client.py`: A client class for interacting with the Google Gemini API.
