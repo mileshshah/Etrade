@@ -127,5 +127,18 @@ class TestGeminiClient(unittest.TestCase):
         self.assertEqual(result, "Analysis result")
         mock_client_instance.models.generate_content.assert_called_once()
 
+    @patch('google.genai.Client')
+    def test_chat(self, mock_genai_client):
+        mock_client_instance = mock_genai_client.return_value
+        mock_response = MagicMock()
+        mock_response.text = "Chat result"
+        mock_client_instance.models.generate_content.return_value = mock_response
+
+        client = GeminiClient('fake_api_key')
+        result = client.chat([{'symbol': 'AAPL', 'company': 'Apple Inc'}], "Is Apple a good buy?")
+
+        self.assertEqual(result, "Chat result")
+        mock_client_instance.models.generate_content.assert_called_once()
+
 if __name__ == '__main__':
     unittest.main()
