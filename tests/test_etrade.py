@@ -112,6 +112,41 @@ class TestETradeApp(unittest.TestCase):
         self.assertEqual(pos['marketValue'], 1500.00)
         mock_get.assert_called_once()
 
+    @patch('etrade_client.requests.post')
+    def test_preview_order(self, mock_post):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'PreviewOrderResponse': {
+                'Order': [{'Instrument': [{'orderAction': 'BUY'}]}],
+                'PreviewIds': [{'previewId': 12345}]
+            }
+        }
+        mock_post.return_value = mock_response
+
+        client = ETradeClient('key', 'secret', 'at', 'ats', 'https://api.com')
+        preview = client.preview_order('acc_key', 'AAPL', 'BUY', 10)
+
+        self.assertEqual(preview['PreviewOrderResponse']['PreviewIds'][0]['previewId'], 12345)
+        mock_post.assert_called_once()
+
+    @patch('etrade_client.requests.post')
+    def test_place_order(self, mock_post):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'PlaceOrderResponse': {
+                'OrderIds': [{'orderId': 67890}]
+            }
+        }
+        mock_post.return_value = mock_response
+
+        client = ETradeClient('key', 'secret', 'at', 'ats', 'https://api.com')
+        place = client.place_order('acc_key', 12345, 'AAPL', 'BUY', 10)
+
+        self.assertEqual(place['PlaceOrderResponse']['OrderIds'][0]['orderId'], 67890)
+        mock_post.assert_called_once()
+
 class TestGeminiClient(unittest.TestCase):
 
     @patch('google.genai.Client')
@@ -122,9 +157,24 @@ class TestGeminiClient(unittest.TestCase):
         mock_client_instance.models.generate_content.return_value = mock_response
 
         client = GeminiClient('fake_api_key')
-        result = client.analyze_portfolio([{'symbol': 'AAPL', 'company': 'Apple Inc'}])
+        # Only symbol, company, and quantity should be present
+        result = client.analyze_portfolio([{'symbol': 'AAPL', 'company': 'Apple Inc', 'quantity': 10}])
 
         self.assertEqual(result, "Analysis result")
+        mock_client_instance.models.generate_content.assert_called_once()
+
+    @patch('google.genai.Client')
+    def test_chat(self, mock_genai_client):
+        mock_client_instance = mock_genai_client.return_value
+        mock_response = MagicMock()
+        mock_response.text = "Chat result"
+        mock_client_instance.models.generate_content.return_value = mock_response
+
+        client = GeminiClient('fake_api_key')
+        # Only symbol, company, and quantity should be present
+        result = client.chat([{'symbol': 'AAPL', 'company': 'Apple Inc', 'quantity': 10}], "Is Apple a good buy?")
+
+        self.assertEqual(result, "Chat result")
         mock_client_instance.models.generate_content.assert_called_once()
 
 if __name__ == '__main__':
