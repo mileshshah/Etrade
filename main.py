@@ -54,7 +54,7 @@ def authenticate(config):
         sys.exit(1)
 
 def list_accounts(client):
-    """Fetch and display the account list."""
+    """Fetch and display the account list with balances."""
     print("\nFetching account list...")
     try:
         accounts_data = client.list_accounts()
@@ -65,13 +65,26 @@ def list_accounts(client):
             return []
 
         print(f"\nFound {len(accounts)} account(s):")
-        print(f"{'Name':<25} {'ID':<15} {'Status':<10}")
-        print("-" * 50)
+        print(f"{'Name':<25} {'ID':<15} {'Status':<10} {'Cash / Net Value':<25}")
+        print("-" * 80)
         for acc in accounts:
             acc_id = acc.get("accountId")
+            acc_key = acc.get("accountIdKey")
             acc_name = acc.get("accountName", acc.get("accountDesc", "Unknown"))
             acc_status = acc.get("accountStatus", "Unknown")
-            print(f"{acc_name:<25} {acc_id:<15} {acc_status:<10}")
+
+            balance_display = "N/A"
+            try:
+                bal_data = client.get_account_balances(acc_key)
+                bal_resp = bal_data.get("BalanceResponse", {})
+                computed = bal_resp.get("Computed", {})
+                cash = computed.get("cashAvailableForInvestment", 0)
+                net_val = computed.get("netAccountValue", 0)
+                balance_display = f"${cash:,.2f} / ${net_val:,.2f}"
+            except Exception:
+                pass
+
+            print(f"{acc_name:<25} {acc_id:<15} {acc_status:<10} {balance_display:<25}")
         return accounts
     except Exception as e:
         print(f"Error listing accounts: {e}")
@@ -265,7 +278,7 @@ def main_menu():
 
     while True:
         print("\n--- Main Menu ---")
-        print("1. View Accounts")
+        print("1. View Accounts & Balances")
         print("2. View Portfolio")
         print("3. Place Order (Buy/Sell)")
         print("4. Chat with Gemini about Portfolio")

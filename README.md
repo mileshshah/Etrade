@@ -69,3 +69,30 @@ python3 -m unittest tests/test_etrade.py
 - `gemini_client.py`: A client class for interacting with the Google Gemini API.
 - `config_sandbox.json` / `config_prod.json`: Configuration files for API keys and URLs.
 - `tests/test_etrade.py`: Unit tests for the authentication, E*TRADE client, and Gemini client logic.
+
+## Running the API Server
+
+You can also run the application as a RESTful API using FastAPI:
+
+1. Start the server:
+
+   ```bash
+   uvicorn api:app --reload
+   ```
+
+2. The API will be available at `http://localhost:8000`. You can access the interactive documentation (Swagger UI) at `http://localhost:8000/docs`.
+
+### API Endpoints
+
+- `POST /auth/initialize`: Get the E*TRADE authorization URL.
+  - Body: `{"env": "sandbox"}`
+- `POST /auth/verify`: Exchange the verifier code for an access token.
+  - Body: `{"verifier": "CODE"}`
+- `GET /accounts`: List all brokerage accounts.
+- `GET /portfolio/{account_id_key}`: View the portfolio for a specific account.
+- `POST /order/preview`: Preview an equity order.
+  - Body: `{"accountIdKey": "...", "symbol": "AAPL", "orderAction": "BUY", "quantity": 10}`
+- `POST /order/place`: Place a previously previewed order.
+  - Body: `{"accountIdKey": "...", "previewId": 123456, ...}`
+- `POST /gemini/chat`: Ask Gemini questions about your portfolio.
+  - Body: `{"accountIdKey": "...", "message": "Explain my risk exposure."}`
