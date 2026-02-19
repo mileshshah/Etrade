@@ -1,6 +1,6 @@
 import json
 import os
-from gemini_client import GeminiClient
+from api.gemini_client import GeminiClient
 
 def load_gemini_key():
     """Attempt to load Gemini key from any available config file."""

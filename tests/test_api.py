@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
-from api import app, state
+from api.server import app, state
 
 class TestAPI(unittest.TestCase):
     def setUp(self):
@@ -13,7 +13,7 @@ class TestAPI(unittest.TestCase):
         state.env = "sandbox"
         state.gemini_api_key = None
 
-    @patch('api.ETradeAuth')
+    @patch('api.server.ETradeAuth')
     @patch('os.path.exists')
     def test_initialize_auth(self, mock_exists, mock_auth):
         mock_exists.return_value = True
@@ -27,7 +27,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(state.env, "sandbox")
         self.assertIsNotNone(state.auth)
 
-    @patch('api.ETradeClient')
+    @patch('api.server.ETradeClient')
     def test_verify_auth(self, mock_client):
         state.auth = MagicMock()
         state.auth.get_access_token.return_value = {"gemini_api_key": "fake_gemini_key"}
@@ -81,7 +81,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"previewId": 123})
 
-    @patch('api.GeminiClient')
+    @patch('api.server.GeminiClient')
     def test_gemini_chat(self, mock_gemini):
         state.client = MagicMock()
         # Mocking the portfolio structure returned by ETradeClient

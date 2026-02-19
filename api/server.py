@@ -4,9 +4,9 @@ from pydantic import BaseModel
 import os
 import json
 
-from etrade_auth import ETradeAuth
-from etrade_client import ETradeClient
-from gemini_client import GeminiClient
+from .etrade_auth import ETradeAuth
+from .etrade_client import ETradeClient
+from .gemini_client import GeminiClient
 
 app = FastAPI(title="E*TRADE API Service")
 

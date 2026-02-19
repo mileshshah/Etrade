@@ -1,9 +1,9 @@
 import json
 import os
 import sys
-from etrade_auth import get_request_token, get_authorization_url, get_access_token
-from etrade_client import ETradeClient
-from gemini_client import GeminiClient
+from api.etrade_auth import get_request_token, get_authorization_url, get_access_token
+from api.etrade_client import ETradeClient
+from api.gemini_client import GeminiClient
 
 def load_config(env):
     """Load configuration for the specified environment."""
