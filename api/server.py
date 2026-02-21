@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Body
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 import os
@@ -9,6 +10,15 @@ from .etrade_client import ETradeClient
 from .gemini_client import GeminiClient
 
 app = FastAPI(title="E*TRADE API Service")
+
+# Enable CORS for React frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Simple in-memory state management
 class AppState:
@@ -45,6 +55,13 @@ class OrderPlaceRequest(BaseModel):
 class ChatRequest(BaseModel):
     accountIdKey: str
     message: str
+
+@app.get("/status")
+def get_status():
+    return {
+        "authenticated": state.client is not None,
+        "env": state.env
+    }
 
 @app.post("/auth/initialize")
 def initialize_auth(req: AuthRequest):
