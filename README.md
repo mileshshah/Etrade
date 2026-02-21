@@ -1,15 +1,15 @@
-# E*TRADE Python Application
+# E*TRADE API Service
 
-A robust Python application providing both a Command Line Interface (CLI) and a RESTful API to interact with E*TRADE and analyze portfolios using Google Gemini.
+A RESTful API service for interacting with E*TRADE and analyzing portfolios using Google Gemini. This project provides a robust backend to manage accounts, view portfolios, place orders, and get AI-driven insights via a REST API.
 
 ## Features
 
-- **OAuth 1.0a Authentication**: Secure handshake with E*TRADE.
-- **Account Management**: List accounts and view real-time balances/cash.
-- **Portfolio Insights**: View holdings with original cost and current market value.
-- **AI Analysis**: Chat with Google Gemini about your portfolio (with strict data privacy).
-- **Order Execution**: Preview and place equity orders (Buy/Sell).
-- **REST API**: Full-featured FastAPI service with Swagger UI.
+- **OAuth 1.0a Authentication**: Secure handshake with E*TRADE via API endpoints.
+- **Account Management**: Retrieve account lists and real-time balances/cash.
+- **Portfolio Insights**: Access holdings with cost basis and current market value.
+- **AI Integration**: Chat with Google Gemini about portfolio data with strict privacy filtering.
+- **Order Execution**: Preview and place equity orders (Buy/Sell) through a secure two-step workflow.
+- **Interactive Documentation**: Built-in Swagger UI for easy endpoint exploration and testing.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ A robust Python application providing both a Command Line Interface (CLI) and a 
 ## Installation
 
 1. Clone the repository.
-2. Install dependencies:
+2. Install the required dependencies:
 
    ```bash
    pip install -r requirements.txt
@@ -28,66 +28,53 @@ A robust Python application providing both a Command Line Interface (CLI) and a 
 
 ## Configuration
 
-Update `config_sandbox.json` and `config_prod.json` with your keys:
+Update `config_sandbox.json` or `config_prod.json` with your respective API keys:
 
 ```json
 {
-    "consumer_key": "YOUR_KEY",
-    "consumer_secret": "YOUR_SECRET",
+    "consumer_key": "YOUR_ETRADE_CONSUMER_KEY",
+    "consumer_secret": "YOUR_ETRADE_CONSUMER_SECRET",
     "base_url": "https://apisb.etrade.com",
     "auth_url": "https://us.etrade.com/e/t/etws/authorize",
-    "gemini_api_key": "YOUR_GEMINI_KEY"
+    "gemini_api_key": "YOUR_GEMINI_API_KEY"
 }
 ```
 
-## Running via CLI
-
-The CLI provides an interactive menu for all features.
-
-1. Start the CLI (defaults to sandbox):
-
-   ```bash
-   python main.py
-   ```
-
-   For production: `python main.py prod`
-
-2. Follow the prompts to authorize via browser and enter the verifier code.
-
 ## Running the API Server
 
-The API server allows other applications to interact with your E*TRADE account.
+Start the FastAPI server using uvicorn:
 
-1. Start the server:
+```bash
+uvicorn api.server:app --reload
+```
 
-   ```bash
-   uvicorn api.server:app --reload
-   ```
+The server will be available at `http://localhost:8000`.
 
-2. **Swagger UI**: Once the server is running, access the interactive documentation and test endpoints at:
-   [http://localhost:8000/docs](http://localhost:8000/docs)
+## API Documentation (Swagger UI)
 
-### API Endpoints
+Once the server is running, you can access the interactive Swagger UI to view all available endpoints, see request/response schemas, and test the API directly from your browser:
 
-- `POST /auth/initialize`: Start OAuth flow.
-- `POST /auth/verify`: Complete authentication with verifier code.
-- `GET /accounts`: List accounts.
-- `GET /accounts/{id}/balance`: Get cash/balances.
-- `GET /portfolio/{id}`: View holdings.
-- `POST /order/preview`: Preview an order.
-- `POST /order/place`: Execute an order.
-- `POST /gemini/chat`: Chat with AI about your holdings.
+**[http://localhost:8000/docs](http://localhost:8000/docs)**
+
+### Key Endpoints
+
+- `POST /auth/initialize`: Initiates the OAuth flow and returns the authorization URL.
+- `POST /auth/verify`: Completes the authentication using the verifier code from E*TRADE.
+- `GET /accounts`: Lists all brokerage accounts.
+- `GET /accounts/{id}/balance`: Retrieves real-time balances and cash available.
+- `GET /portfolio/{id}`: Returns the current holdings for an account.
+- `POST /order/preview`: Previews an equity order.
+- `POST /order/place`: Places an order using a `previewId`.
+- `POST /gemini/chat`: Sends filtered portfolio data to Gemini for analysis or chat.
 
 ## Testing
 
-Run the automated test suite:
+Run the automated test suite to verify the API and E*TRADE client logic:
 
 ```bash
 python3 -m unittest discover tests
 ```
 
-Run the manual UI/AI simulation:
+## Data Privacy
 
-```bash
-python manual_test.py
-```
+This project is designed with financial data privacy in mind. When using the Gemini AI integration, only the `symbol`, `company description`, and `quantity` of your holdings are shared with the AI model. Sensitive metrics like account balances, market values, and prices paid are filtered out before being sent to the AI.
