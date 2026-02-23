@@ -63,3 +63,23 @@ You need to run both the backend and frontend simultaneously.
 ## Data Privacy
 
 Only `symbol`, `company description`, and `quantity` are shared with Gemini. Sensitive financial values are strictly filtered out by the backend before reaching the AI.
+
+## Running with Docker (Recommended)
+
+You can run the entire application (Backend + Frontend) using Docker Compose. This is the easiest way to get started.
+
+### Prerequisites
+- Docker and Docker Compose installed.
+
+### Steps
+1. **Configure API Keys**: Ensure `config_sandbox.json` or `config_prod.json` are updated with your E*TRADE and Gemini keys.
+2. **Start the Application**:
+   ```bash
+   docker-compose up --build
+   ```
+3. **Access the Dashboard**:
+   Open your browser to [http://localhost](http://localhost).
+
+### Troubleshooting
+- The frontend container uses an Nginx proxy to communicate with the backend. Ensure port 80 and 8000 are not already in use on your host.
+- If you change the configuration files on your host, you may need to restart the containers (`docker-compose restart backend`).
