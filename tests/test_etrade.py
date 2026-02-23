@@ -7,13 +7,13 @@ import os
 # Add the current directory to path so we can import our modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from etrade_auth import get_request_token, get_access_token
-from etrade_client import ETradeClient
-from gemini_client import GeminiClient
+from api.etrade_auth import get_request_token, get_access_token
+from api.etrade_client import ETradeClient
+from api.gemini_client import GeminiClient
 
 class TestETradeApp(unittest.TestCase):
 
-    @patch('etrade_auth.OAuth1Session')
+    @patch('api.etrade_auth.OAuth1Session')
     def test_get_request_token(self, mock_oauth):
         mock_session = mock_oauth.return_value
         mock_session.fetch_request_token.return_value = {
@@ -27,7 +27,7 @@ class TestETradeApp(unittest.TestCase):
         self.assertEqual(rts, 'fake_rts')
         mock_session.fetch_request_token.assert_called_once()
 
-    @patch('etrade_auth.OAuth1Session')
+    @patch('api.etrade_auth.OAuth1Session')
     def test_get_access_token(self, mock_oauth):
         mock_session = mock_oauth.return_value
         mock_session.fetch_access_token.return_value = {
@@ -41,7 +41,7 @@ class TestETradeApp(unittest.TestCase):
         self.assertEqual(ats, 'fake_ats')
         mock_session.fetch_access_token.assert_called_once()
 
-    @patch('etrade_client.requests.get')
+    @patch('api.etrade_client.requests.get')
     def test_list_accounts(self, mock_get):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -54,7 +54,7 @@ class TestETradeApp(unittest.TestCase):
         self.assertEqual(accounts['AccountListResponse']['Accounts']['Account'], [])
         mock_get.assert_called_once()
 
-    @patch('etrade_client.requests.get')
+    @patch('api.etrade_client.requests.get')
     def test_get_account_balances(self, mock_get):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -78,7 +78,7 @@ class TestETradeApp(unittest.TestCase):
         self.assertEqual(balance['BalanceResponse']['Computed']['realTimeValues']['totalAccountValue'], 5000.00)
         mock_get.assert_called_once()
 
-    @patch('etrade_client.requests.get')
+    @patch('api.etrade_client.requests.get')
     def test_view_portfolio(self, mock_get):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -112,7 +112,7 @@ class TestETradeApp(unittest.TestCase):
         self.assertEqual(pos['marketValue'], 1500.00)
         mock_get.assert_called_once()
 
-    @patch('etrade_client.requests.post')
+    @patch('api.etrade_client.requests.post')
     def test_preview_order(self, mock_post):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -130,7 +130,7 @@ class TestETradeApp(unittest.TestCase):
         self.assertEqual(preview['PreviewOrderResponse']['PreviewIds'][0]['previewId'], 12345)
         mock_post.assert_called_once()
 
-    @patch('etrade_client.requests.post')
+    @patch('api.etrade_client.requests.post')
     def test_place_order(self, mock_post):
         mock_response = MagicMock()
         mock_response.status_code = 200

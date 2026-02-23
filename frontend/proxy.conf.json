@@ -1,0 +1,26 @@
+{
+  "/status": {
+    "target": "http://localhost:8000",
+    "secure": false
+  },
+  "/auth": {
+    "target": "http://localhost:8000",
+    "secure": false
+  },
+  "/accounts": {
+    "target": "http://localhost:8000",
+    "secure": false
+  },
+  "/portfolio": {
+    "target": "http://localhost:8000",
+    "secure": false
+  },
+  "/order": {
+    "target": "http://localhost:8000",
+    "secure": false
+  },
+  "/gemini": {
+    "target": "http://localhost:8000",
+    "secure": false
+  }
+}

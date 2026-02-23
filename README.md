@@ -1,71 +1,85 @@
-# E*TRADE Python Application
+# E*TRADE AI Full-Stack Dashboard (Angular)
 
-A basic Python application that demonstrates how to authenticate with the E*TRADE API using OAuth 1.0a, fetch account information, and analyze your portfolio using Google Gemini.
+A full-stack application featuring a FastAPI backend and an Angular frontend to manage your E*TRADE portfolio and get insights from Google Gemini.
+
+## Features
+
+- **Angular Dashboard**: Modern, dark-themed UI for all account activities.
+- **Account View**: Real-time cash and net value display.
+- **Portfolio Table**: Detailed view of holdings (Symbol, Qty, Cost, Market Value).
+- **Interactive Orders**: Preview and place Buy/Sell orders directly from the UI.
+- **Gemini AI Chat**: Dedicated sidebar to chat with Gemini about your holdings (privacy-filtered).
+- **FastAPI Backend**: Robust API with OAuth 1.0a and Swagger documentation.
 
 ## Prerequisites
 
-- Python 3.6 or higher
-- An E*TRADE account with API keys (Sandbox or Production)
-- A Google Gemini API key (from [Google AI Studio](https://aistudio.google.com/))
+- Python 3.6+
+- Node.js (v18+) and npm
+- Angular CLI (`npm install -g @angular/cli`)
+- E*TRADE API keys
+- Google Gemini API key
 
-## Installation
+## Installation & Setup
 
-1. Clone this repository (or copy the files).
-2. Install the required dependencies:
-
+1. **Backend Setup**:
    ```bash
    pip install -r requirements.txt
    ```
+   Update `config_sandbox.json` or `config_prod.json` with your keys.
 
-## Configuration
-
-1. Locate the configuration files: `config_sandbox.json` and `config_prod.json`.
-2. Update the appropriate file with your E*TRADE Consumer Key, Consumer Secret, and Gemini API Key:
-
-   ```json
-   {
-       "consumer_key": "YOUR_CONSUMER_KEY",
-       "consumer_secret": "YOUR_CONSUMER_SECRET",
-       "base_url": "https://apisb.etrade.com",
-       "auth_url": "https://us.etrade.com/e/t/etws/authorize",
-       "gemini_api_key": "YOUR_GEMINI_API_KEY"
-   }
+2. **Frontend Setup**:
+   ```bash
+   cd frontend
+   npm install
    ```
 
 ## Running the Application
 
-1. Run the main script (defaults to sandbox):
+You need to run both the backend and frontend simultaneously.
 
+1. **Start Backend**:
    ```bash
-   python main.py
+   uvicorn api.server:app --reload
    ```
+   Backend runs at `http://localhost:8000`. Swagger docs at `/docs`.
 
-   To run in production mode:
-
+2. **Start Frontend**:
    ```bash
-   python main.py prod
+   cd frontend
+   npm start
    ```
+   Frontend opens at `http://localhost:4200` (default Angular port).
 
-2. Follow the on-screen instructions:
-   - Step 1: The application will fetch a request token.
-   - Step 2: It will provide a URL. Copy and paste this URL into your browser.
-   - Step 3: Log in to E*TRADE and authorize the application.
-   - Step 4: Copy the verification code provided by E*TRADE and paste it back into the terminal.
-   - Step 5: The application will fetch the access token, display your account details, and perform a Gemini analysis of your portfolio.
+## UI Overview
 
-## Running Tests
+- **Auth Screen**: If not authenticated, you'll be prompted to choose an environment (Sandbox/Prod), visit the E*TRADE auth URL, and enter your verifier code.
+- **Header**: Displays the application name and an account selector.
+- **Left/Center Panels**:
+  - **Account Info**: Displays current cash and net value.
+  - **Place Order**: Form to preview and execute stock trades.
+  - **Portfolio**: Table showing current holdings.
+- **Right Panel**: **Gemini AI Analyst** chatbot.
 
-To run the unit tests and verify the logic:
+## Data Privacy
 
-```bash
-python3 -m unittest tests/test_etrade.py
-```
+Only `symbol`, `company description`, and `quantity` are shared with Gemini. Sensitive financial values are strictly filtered out by the backend before reaching the AI.
 
-## File Structure
+## Running with Docker (Recommended)
 
-- `main.py`: The entry point that orchestrates the OAuth flow, API calls, and Gemini analysis.
-- `etrade_auth.py`: Contains functions for handling the OAuth 1.0a handshake.
-- `etrade_client.py`: A client class for making signed requests to E*TRADE API endpoints.
-- `gemini_client.py`: A client class for interacting with the Google Gemini API.
-- `config_sandbox.json` / `config_prod.json`: Configuration files for API keys and URLs.
-- `tests/test_etrade.py`: Unit tests for the authentication, E*TRADE client, and Gemini client logic.
+You can run the entire application (Backend + Frontend) using Docker Compose. This is the easiest way to get started.
+
+### Prerequisites
+- Docker and Docker Compose installed.
+
+### Steps
+1. **Configure API Keys**: Ensure `config_sandbox.json` or `config_prod.json` are updated with your E*TRADE and Gemini keys.
+2. **Start the Application**:
+   ```bash
+   docker-compose up --build
+   ```
+3. **Access the Dashboard**:
+   Open your browser to [http://localhost](http://localhost).
+
+### Troubleshooting
+- The frontend container uses an Nginx proxy to communicate with the backend. Ensure port 80 and 8000 are not already in use on your host.
+- If you change the configuration files on your host, you may need to restart the containers (`docker-compose restart backend`).

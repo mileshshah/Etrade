@@ -6,12 +6,28 @@ import random
 import string
 
 class ETradeClient:
-    def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret, base_url):
-        self.consumer_key = consumer_key
-        self.consumer_secret = consumer_secret
-        self.access_token = access_token
-        self.access_token_secret = access_token_secret
-        self.base_url = base_url
+    def __init__(self, consumer_key=None, consumer_secret=None, access_token=None, access_token_secret=None, base_url=None, credentials=None):
+        if credentials:
+            self.consumer_key = credentials['consumer_key']
+            self.consumer_secret = credentials['consumer_secret']
+            self.access_token = credentials['access_token']
+            self.access_token_secret = credentials['access_token_secret']
+            self.base_url = credentials['base_url']
+        elif isinstance(consumer_key, dict):
+            # Handle case where first positional arg is the credentials dict
+            credentials = consumer_key
+            self.consumer_key = credentials['consumer_key']
+            self.consumer_secret = credentials['consumer_secret']
+            self.access_token = credentials['access_token']
+            self.access_token_secret = credentials['access_token_secret']
+            self.base_url = credentials['base_url']
+        else:
+            self.consumer_key = consumer_key
+            self.consumer_secret = consumer_secret
+            self.access_token = access_token
+            self.access_token_secret = access_token_secret
+            self.base_url = base_url
+
         # OAuth1 object for signing requests
         self.auth = OAuth1(
             self.consumer_key,
