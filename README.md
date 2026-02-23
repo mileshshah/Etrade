@@ -1,10 +1,10 @@
-# E*TRADE AI Full-Stack Dashboard
+# E*TRADE AI Full-Stack Dashboard (Angular)
 
-A full-stack application featuring a FastAPI backend and a React frontend to manage your E*TRADE portfolio and get insights from Google Gemini.
+A full-stack application featuring a FastAPI backend and an Angular frontend to manage your E*TRADE portfolio and get insights from Google Gemini.
 
 ## Features
 
-- **React Dashboard**: Modern, dark-themed UI for all account activities.
+- **Angular Dashboard**: Modern, dark-themed UI for all account activities.
 - **Account View**: Real-time cash and net value display.
 - **Portfolio Table**: Detailed view of holdings (Symbol, Qty, Cost, Market Value).
 - **Interactive Orders**: Preview and place Buy/Sell orders directly from the UI.
@@ -15,6 +15,7 @@ A full-stack application featuring a FastAPI backend and a React frontend to man
 
 - Python 3.6+
 - Node.js (v18+) and npm
+- Angular CLI (`npm install -g @angular/cli`)
 - E*TRADE API keys
 - Google Gemini API key
 
@@ -47,7 +48,7 @@ You need to run both the backend and frontend simultaneously.
    cd frontend
    npm start
    ```
-   Frontend opens at `http://localhost:3000`.
+   Frontend opens at `http://localhost:4200` (default Angular port).
 
 ## UI Overview
 

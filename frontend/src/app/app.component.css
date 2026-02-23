@@ -1,21 +1,3 @@
-:root {
-  --bg-main: #0a0b0d;
-  --bg-card: #14171a;
-  --border: #2d333b;
-  --text-main: #e6edf3;
-  --text-dim: #848d97;
-  --primary: #238636;
-  --primary-hover: #2ea043;
-  --accent: #1f6feb;
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg-main);
-  color: var(--text-main);
-}
-
 .app-layout {
   display: flex;
   flex-direction: column;
@@ -45,6 +27,15 @@ header {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.refresh-icon {
+  cursor: pointer;
+  color: var(--text-dim);
+}
+
+.refresh-icon:hover {
+  color: var(--text-main);
 }
 
 select {
@@ -144,6 +135,19 @@ button {
 
 button:hover { background: var(--primary-hover); }
 button.secondary { background: var(--border); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.order-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 
 .portfolio-card {
   overflow-x: auto;
@@ -209,6 +213,12 @@ td {
   border: 1px solid var(--border);
 }
 
+.message.error {
+  align-self: center;
+  background: #440000;
+  color: #ffcccc;
+}
+
 .chat-input {
   padding: 15px;
   border-top: 1px solid var(--border);
@@ -262,4 +272,9 @@ td {
   color: var(--accent);
   text-decoration: none;
   font-weight: 600;
+}
+
+.error {
+  color: #ff6b6b;
+  margin-top: 10px;
 }

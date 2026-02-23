@@ -1,0 +1,26 @@
+:root {
+  --bg-main: #0a0b0d;
+  --bg-card: #14171a;
+  --border: #2d333b;
+  --text-main: #e6edf3;
+  --text-dim: #848d97;
+  --primary: #238636;
+  --primary-hover: #2ea043;
+  --accent: #1f6feb;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+
+.dark-theme {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+}
+
+* {
+  box-sizing: border-box;
+}
