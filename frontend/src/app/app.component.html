@@ -31,8 +31,8 @@
       <span>E*TRADE AI</span>
     </div>
     <div class="account-selector">
-      <lucide-icon [name]="RefreshCw" (click)="fetchAccounts()" class="refresh-icon" size="18"></lucide-icon>
-      <select [ngModel]="selectedAccount?.accountId" (change)="onAccountChange()">
+      <lucide-icon [name]="RefreshCw" (click)="fetchAccounts()" class="refresh-icon" size={18}></lucide-icon>
+      <select [ngModel]="selectedAccount?.accountId" (change)="onAccountChange($event)">
         <option *ngFor="let acc of accounts" [value]="acc.accountId">
           {{acc.accountName}} ({{acc.accountId}})
         </option>
@@ -72,7 +72,7 @@
             </div>
           </div>
 
-          <form *ngIf="!preview" class="order-form" (submit)="handlePreview()">
+          <form *ngIf="!preview" class="order-form" (submit)="handlePreview($event)">
             <div class="form-group">
               <input
                 placeholder="Symbol"
@@ -139,7 +139,7 @@
         </div>
         <div *ngIf="chatLoading" class="message gemini loading">Thinking...</div>
       </div>
-      <form (submit)="handleSendMessage()" class="chat-input">
+      <form (submit)="handleSendMessage($event)" class="chat-input">
         <input
           [(ngModel)]="chatInput"
           name="chatInput"

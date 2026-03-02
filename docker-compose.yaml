@@ -1,6 +1,5 @@
 services:
   backend:
-    image: etrade-backend:latest
     build:
       context: .
       dockerfile: backend.Dockerfile
@@ -13,7 +12,6 @@ services:
       - PYTHONUNBUFFERED=1
 
   frontend:
-    image: etrade-frontend:latest
     build:
       context: .
       dockerfile: frontend.Dockerfile

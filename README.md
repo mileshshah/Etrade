@@ -113,3 +113,14 @@ This indicates that your terminal cannot communicate with the Docker engine. To 
 3. **Verify Context**: Run `docker context ls` in your terminal. If `default` is not selected (asterisk next to it), run `docker context use default`.
 4. **Test Connection**: Run `docker ps`. If it fails with the same error, your terminal context is not set correctly. Try restarting your terminal (PowerShell or Command Prompt).
 5. **Admin Rights**: Sometimes Docker requires the terminal to be run as an Administrator.
+
+### ✅ Docker Pre-Flight Checklist (Windows)
+If you continue to get "The system cannot find the file specified" regarding `dockerDesktopLinuxEngine`:
+
+1. **Verify Engine**: Open PowerShell and run `docker version`. If this returns an error, your engine is not running.
+2. **Context Check**: Run `docker context ls`. If it shows `default` and `desktop-linux`, try switching: `docker context use desktop-linux`.
+3. **Reset Docker Desktop**:
+   - Right-click the Docker icon in the tray.
+   - Select **Troubleshoot**.
+   - Click **Restart Docker Desktop**.
+4. **Environment Variables**: Ensure your user profile doesn't have a stale `DOCKER_HOST` variable. Run `ls env:DOCKER_HOST` in PowerShell. If it exists, remove it.

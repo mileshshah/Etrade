@@ -12,10 +12,10 @@ from .trading_tools import TradingTools
 
 app = FastAPI(title="E*TRADE API Service")
 
-# Enable CORS for Angular frontend
+# Enable CORS for Angular frontend (local dev and Docker)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],
+    allow_origins=["http://localhost:4200", "http://localhost"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -73,6 +73,8 @@ def initialize_auth(req: AuthRequest):
 
     state.auth = ETradeAuth(config_file)
     url = state.auth.get_authorization_url()
+    # Reset gemini client on new auth flow to handle potential API key changes
+    state.gemini = None
     return {"authorization_url": url}
 
 @app.post("/auth/verify")
