@@ -32,7 +32,7 @@
     </div>
     <div class="account-selector">
       <lucide-icon [name]="RefreshCw" (click)="fetchAccounts()" class="refresh-icon" size="18"></lucide-icon>
-      <select [ngModel]="selectedAccount?.accountId" (change)="onAccountChange($event)">
+      <select [ngModel]="selectedAccount?.accountId" (change)="onAccountChange()">
         <option *ngFor="let acc of accounts" [value]="acc.accountId">
           {{acc.accountName}} ({{acc.accountId}})
         </option>
@@ -72,7 +72,7 @@
             </div>
           </div>
 
-          <form *ngIf="!preview" class="order-form" (submit)="handlePreview($event)">
+          <form *ngIf="!preview" class="order-form" (submit)="handlePreview()">
             <div class="form-group">
               <input
                 placeholder="Symbol"
@@ -139,7 +139,7 @@
         </div>
         <div *ngIf="chatLoading" class="message gemini loading">Thinking...</div>
       </div>
-      <form (submit)="handleSendMessage($event)" class="chat-input">
+      <form (submit)="handleSendMessage()" class="chat-input">
         <input
           [(ngModel)]="chatInput"
           name="chatInput"

@@ -83,3 +83,17 @@ You can run the entire application (Backend + Frontend) using Docker Compose. Th
 ### Troubleshooting
 - The frontend container uses an Nginx proxy to communicate with the backend. Ensure port 80 and 8000 are not already in use on your host.
 - If you change the configuration files on your host, you may need to restart the containers (`docker-compose restart backend`).
+
+## AI-Driven Trading
+
+This application now supports AI-driven trading via Gemini. You can instruct Gemini to preview or execute trades for you.
+
+- **Function Calling**: Gemini is equipped with tools to call `preview_etrade_trade` and `place_etrade_trade`.
+- **Account Awareness**: Gemini is provided with your current cash balance and holdings to help inform its actions.
+- **Manual Confirmation**: While Gemini can call the tools, it's recommended to first ask it to 'preview' a trade so you can see the estimates before it 'places' the order.
+
+**Example Interaction:**
+> "Gemini, I have $5000 in cash. Preview a buy of 10 shares of AAPL for me."
+
+Gemini will call the preview tool, report the estimated cost, and then you can say:
+> "Looks good, place the order."
