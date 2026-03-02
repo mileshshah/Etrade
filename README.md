@@ -103,3 +103,13 @@ If you see errors related to `open //./pipe/dockerDesktopLinuxEngine`, this usua
 - Ensure Docker Desktop is open and the Docker engine has started.
 - Try running `docker ps` in your terminal to verify connection.
 - If on Windows, ensure you are using a terminal that supports Linux paths (e.g., PowerShell or Git Bash) or use WSL2.
+
+### ⚠️ Common Docker Desktop (Windows) Errors
+If you see: `open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.`
+
+This indicates that your terminal cannot communicate with the Docker engine. To fix:
+1. **Start Docker Desktop**: Ensure the Docker icon is in your system tray and is green (Running).
+2. **Check WSL2 Settings**: Go to Docker Desktop Settings > General and ensure "Use the WSL 2 based engine" is checked.
+3. **Verify Context**: Run `docker context ls` in your terminal. If `default` is not selected (asterisk next to it), run `docker context use default`.
+4. **Test Connection**: Run `docker ps`. If it fails with the same error, your terminal context is not set correctly. Try restarting your terminal (PowerShell or Command Prompt).
+5. **Admin Rights**: Sometimes Docker requires the terminal to be run as an Administrator.
