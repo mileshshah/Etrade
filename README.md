@@ -97,3 +97,9 @@ This application now supports AI-driven trading via Gemini. You can instruct Gem
 
 Gemini will call the preview tool, report the estimated cost, and then you can say:
 > "Looks good, place the order."
+
+### Windows / Docker Desktop Issues
+If you see errors related to `open //./pipe/dockerDesktopLinuxEngine`, this usually means Docker Desktop is not running or the Docker context is incorrect.
+- Ensure Docker Desktop is open and the Docker engine has started.
+- Try running `docker ps` in your terminal to verify connection.
+- If on Windows, ensure you are using a terminal that supports Linux paths (e.g., PowerShell or Git Bash) or use WSL2.
