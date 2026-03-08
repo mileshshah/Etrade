@@ -31,7 +31,7 @@
       <span>E*TRADE AI</span>
     </div>
     <div class="account-selector">
-      <lucide-icon [name]="RefreshCw" (click)="fetchAccounts()" class="refresh-icon" size={18}></lucide-icon>
+      <lucide-icon [name]="RefreshCw" (click)="fetchAccounts()" class="refresh-icon" size="18"></lucide-icon>
       <select [ngModel]="selectedAccount?.accountId" (change)="onAccountChange($event)">
         <option *ngFor="let acc of accounts" [value]="acc.accountId">
           {{acc.accountName}} ({{acc.accountId}})

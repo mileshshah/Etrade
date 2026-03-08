@@ -124,3 +124,28 @@ If you continue to get "The system cannot find the file specified" regarding `do
    - Select **Troubleshoot**.
    - Click **Restart Docker Desktop**.
 4. **Environment Variables**: Ensure your user profile doesn't have a stale `DOCKER_HOST` variable. Run `ls env:DOCKER_HOST` in PowerShell. If it exists, remove it.
+
+### 🛑 Resolving "500 Internal Server Error" & "API Version Mismatch"
+If you see `request returned 500 Internal Server Error` or `check if the server supports the requested API version`:
+
+1. **Use Docker Compose V2**:
+   Try running: `docker compose up --build` (no hyphen) instead of `docker-compose`.
+   V2 is built into the Docker CLI and is more robust.
+
+2. **Unset Version Overrides**:
+   Stale environment variables can force an incompatible API version. In PowerShell:
+   ```powershell
+   [Environment]::SetEnvironmentVariable("DOCKER_API_VERSION", $null, "User")
+   [Environment]::SetEnvironmentVariable("COMPOSE_API_VERSION", $null, "User")
+   ```
+   Then restart your terminal.
+
+3. **Prune Corrupt Build Cache**:
+   Corrupt images can cause metadata lookup failures. Run:
+   ```bash
+   docker system prune -a --volumes
+   ```
+
+4. **Update/Reset Docker Desktop**:
+   - Ensure you are on the latest version of Docker Desktop.
+   - Go to **Settings > Troubleshooting > Reset to factory defaults**.
