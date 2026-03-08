@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.editorconfig
+npm-debug.log*
+yarn-debug.log*
+
+# Git
+.git/
+.gitignore
+
+# Misc
+.DS_Store
+.vscode/
+.idea/
+README.md
+docker-compose.yaml
+backend.Dockerfile
+frontend.Dockerfile
+nginx.conf

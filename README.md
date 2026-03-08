@@ -83,3 +83,69 @@ You can run the entire application (Backend + Frontend) using Docker Compose. Th
 ### Troubleshooting
 - The frontend container uses an Nginx proxy to communicate with the backend. Ensure port 80 and 8000 are not already in use on your host.
 - If you change the configuration files on your host, you may need to restart the containers (`docker-compose restart backend`).
+
+## AI-Driven Trading
+
+This application now supports AI-driven trading via Gemini. You can instruct Gemini to preview or execute trades for you.
+
+- **Function Calling**: Gemini is equipped with tools to call `preview_etrade_trade` and `place_etrade_trade`.
+- **Account Awareness**: Gemini is provided with your current cash balance and holdings to help inform its actions.
+- **Manual Confirmation**: While Gemini can call the tools, it's recommended to first ask it to 'preview' a trade so you can see the estimates before it 'places' the order.
+
+**Example Interaction:**
+> "Gemini, I have $5000 in cash. Preview a buy of 10 shares of AAPL for me."
+
+Gemini will call the preview tool, report the estimated cost, and then you can say:
+> "Looks good, place the order."
+
+### Windows / Docker Desktop Issues
+If you see errors related to `open //./pipe/dockerDesktopLinuxEngine`, this usually means Docker Desktop is not running or the Docker context is incorrect.
+- Ensure Docker Desktop is open and the Docker engine has started.
+- Try running `docker ps` in your terminal to verify connection.
+- If on Windows, ensure you are using a terminal that supports Linux paths (e.g., PowerShell or Git Bash) or use WSL2.
+
+### ⚠️ Common Docker Desktop (Windows) Errors
+If you see: `open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.`
+
+This indicates that your terminal cannot communicate with the Docker engine. To fix:
+1. **Start Docker Desktop**: Ensure the Docker icon is in your system tray and is green (Running).
+2. **Check WSL2 Settings**: Go to Docker Desktop Settings > General and ensure "Use the WSL 2 based engine" is checked.
+3. **Verify Context**: Run `docker context ls` in your terminal. If `default` is not selected (asterisk next to it), run `docker context use default`.
+4. **Test Connection**: Run `docker ps`. If it fails with the same error, your terminal context is not set correctly. Try restarting your terminal (PowerShell or Command Prompt).
+5. **Admin Rights**: Sometimes Docker requires the terminal to be run as an Administrator.
+
+### ✅ Docker Pre-Flight Checklist (Windows)
+If you continue to get "The system cannot find the file specified" regarding `dockerDesktopLinuxEngine`:
+
+1. **Verify Engine**: Open PowerShell and run `docker version`. If this returns an error, your engine is not running.
+2. **Context Check**: Run `docker context ls`. If it shows `default` and `desktop-linux`, try switching: `docker context use desktop-linux`.
+3. **Reset Docker Desktop**:
+   - Right-click the Docker icon in the tray.
+   - Select **Troubleshoot**.
+   - Click **Restart Docker Desktop**.
+4. **Environment Variables**: Ensure your user profile doesn't have a stale `DOCKER_HOST` variable. Run `ls env:DOCKER_HOST` in PowerShell. If it exists, remove it.
+
+### 🛑 Resolving "500 Internal Server Error" & "API Version Mismatch"
+If you see `request returned 500 Internal Server Error` or `check if the server supports the requested API version`:
+
+1. **Use Docker Compose V2**:
+   Try running: `docker compose up --build` (no hyphen) instead of `docker-compose`.
+   V2 is built into the Docker CLI and is more robust.
+
+2. **Unset Version Overrides**:
+   Stale environment variables can force an incompatible API version. In PowerShell:
+   ```powershell
+   [Environment]::SetEnvironmentVariable("DOCKER_API_VERSION", $null, "User")
+   [Environment]::SetEnvironmentVariable("COMPOSE_API_VERSION", $null, "User")
+   ```
+   Then restart your terminal.
+
+3. **Prune Corrupt Build Cache**:
+   Corrupt images can cause metadata lookup failures. Run:
+   ```bash
+   docker system prune -a --volumes
+   ```
+
+4. **Update/Reset Docker Desktop**:
+   - Ensure you are on the latest version of Docker Desktop.
+   - Go to **Settings > Troubleshooting > Reset to factory defaults**.

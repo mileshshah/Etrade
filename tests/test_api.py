@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, ANY
 from fastapi.testclient import TestClient
 from api.server import app, state
 
@@ -111,7 +111,7 @@ class TestAPI(unittest.TestCase):
 
         # Verify filtering: Gemini should be called with filtered data
         expected_data = [{"symbol": "AAPL", "company": "Apple Inc.", "quantity": 10}]
-        state.gemini.chat.assert_called_with(expected_data, "hello")
+        state.gemini.chat.assert_called_with(expected_data, "hello", account_context=ANY, tools=ANY)
 
 if __name__ == '__main__':
     unittest.main()

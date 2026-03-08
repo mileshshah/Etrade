@@ -8,13 +8,14 @@ import json
 from .etrade_auth import ETradeAuth
 from .etrade_client import ETradeClient
 from .gemini_client import GeminiClient
+from .trading_tools import TradingTools
 
 app = FastAPI(title="E*TRADE API Service")
 
-# Enable CORS for React frontend
+# Enable CORS for Angular frontend (local dev and Docker)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],
+    allow_origins=["http://localhost:4200", "http://localhost"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -72,6 +73,8 @@ def initialize_auth(req: AuthRequest):
 
     state.auth = ETradeAuth(config_file)
     url = state.auth.get_authorization_url()
+    # Reset gemini client on new auth flow to handle potential API key changes
+    state.gemini = None
     return {"authorization_url": url}
 
 @app.post("/auth/verify")
@@ -168,10 +171,27 @@ def chat_portfolio(req: ChatRequest):
     except (IndexError, AttributeError):
         pass
 
-    if not filtered_data:
-        raise HTTPException(status_code=404, detail="No positions found in portfolio to analyze")
+    # Provide account context (cash balance)
+    account_context = {}
+    try:
+        balance_data = state.client.get_account_balances(req.accountIdKey)
+        balance = balance_data.get('BalanceResponse', {}).get('Computed', {})
+        account_context = {
+            "accountIdKey": req.accountIdKey,
+            "cashAvailable": balance.get('cashAvailableForInvestment', 0),
+            "netValue": balance.get('netAccountValue', 0)
+        }
+    except Exception:
+        pass
 
-    response = state.gemini.chat(filtered_data, req.message)
+    # Provide trading tools
+    tools = TradingTools(state.client)
+    gemini_tools = [
+        tools.preview_etrade_trade,
+        tools.place_etrade_trade
+    ]
+
+    response = state.gemini.chat(filtered_data, req.message, account_context=account_context, tools=gemini_tools)
     return {"response": response}
 
 if __name__ == "__main__":
